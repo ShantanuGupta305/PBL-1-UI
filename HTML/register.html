@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+</head>
+<body>
+    <form id="registerForm">
+        <label for="username">Username:</label>
+        <input type="text" name="username" pattern="^[a-zA-Z0-9]{6,}$" title="Username must be at least 6 characters long and contain only letters and numbers." placeholder="username" required>
+        <label for="password">Password:</label>
+        <input type="password" name="password" pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" title="Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character." required>
+        <label for="confirm password">Confirm Password:</label>
+        <input type="password" name="confirm password" placeholder="confirm password" required>
+        <label for="email">Email:</label>
+        <input type="email" name="email" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Please enter a valid email address (e.g., user@gmail.com or user@hotmail.com)." placeholder="email" required>
+        <label for="Mobile">Mobile:</label>
+        <input type="number" name="mobile" pattern="^\d{10}$" title="Please enter a valid 10-digit mobile number." placeholder="Mobile" required>
+        <label for="Aadhaar">Aadhaar:</label>
+        <input type="number" name="aadhaar" pattern="^\d{12}$" title="Please enter a valid 12-digit aadhaar number." placeholder="Aadhaar" required>
+        <button type="submit">Register</button>
+        <label for="Already Registered">Alredy Resgistered:</label>
+        <a href="./login.html">Login here</a>
+    </form>
+    <script src="../Javascript/script.js"></script>
+</body>
+</html>

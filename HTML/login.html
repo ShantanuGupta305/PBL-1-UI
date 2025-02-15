@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+</head>
+<body>
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" name="username" placeholder="username" required>
+        <label for="password">Password:</label>
+        <input type="password" name="password" placeholder="password" required>
+        <button  type="submit">Login</button>
+    </form>
+    <label for="Not Registered">Not Resgistered:</label>
+    <a href="./register.html">Register here</a>
+    <script>
+        const usersArray=localStorage.getItem('users');
+        const LoggedUser=localStorage.getItem('loggedUser');
+        let activeUser;
+        let users;
+        if(usersArray){
+            users=JSON.parse(usersArray);
+        }
+        else{
+            users=[];
+        }
+        if(LoggedUser){
+            activeUser=JSON.parse(LoggedUser)[0];
+        }
+        const logForm=document.getElementById('loginForm');
+        logForm.addEventListener('submit',(e)=>{
+            e.preventDefault();
+            let flag=false;
+            users.forEach(user=>{
+                if(user.username===logForm.elements['username'].value && user.password===logForm.elements['password'].value){
+                    flag=true;
+                    activeUser=user;
+                    return;
+                }
+            });
+            if(flag===false){
+                alert('Invalid Credentials');
+            }
+            else{
+                localStorage.setItem('loggedUser',JSON.stringify(activeUser));
+                window.location.href='customer_portal.html';
+                alert(`${activeUser.username} logged in`);
+            }
+        });
+    </script>
+</body>
+</html>
