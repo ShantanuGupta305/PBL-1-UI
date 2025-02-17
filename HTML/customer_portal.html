@@ -1,11 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custormer Portal</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../CSS/customer_portal.css">
+  <title>Customer Portal</title>
+  <!-- <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .section {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .hidden {
+      display: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+  </style> -->
 </head>
 <body>
-    
+
+<div class="section" id="table-aggregate-section">
+  <h2>Table Aggregate Section</h2>
+  <h3>Number of Tickets Booked Per Category</h3>
+  <table id="category-table">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Tickets Booked</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>Number of Tickets Booked Per Quarter</h3>
+  <table id="quarter-table">
+    <thead>
+      <tr>
+        <th>Quarter</th>
+        <th>Tickets Booked</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="section" id="booking-section">
+  <h2>Book Ticket</h2>
+  <form id="ticketForm">
+    <label for="aadhaar">Aadhaar:</label>
+    <input type="text" id="aadhaar" name="aadhaar" readonly><br><br>
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" readonly><br><br>
+
+    <label for="mobile">Mobile:</label>
+    <input type="text" id="mobile" name="mobile" readonly><br><br>
+
+    <label for="date">Date:</label>
+    <input type="date" id="date" name="date" required><br><br>
+
+    <label for="boarding">Boarding Station:</label>
+    <input type="text" id="boarding" name="boarding" required><br><br>
+
+    <label for="destination">Destination Station:</label>
+    <input type="text" id="destination" name="destination" required><br><br>
+
+    <label for="category">Ticket Category:</label>
+    <select id="category" name="category" required>
+      <option value="AC-1">AC-1</option>
+      <option value="AC-2">AC-2</option>
+      <option value="AC-3">AC-3</option>
+    </select><br><br>
+
+    <button type="button" onclick="findTrains()">Find Trains</button>
+  </form>
+
+  <div id="train-selection" class="hidden">
+    <h3>Available Trains</h3>
+    <div id="train-list"></div>
+  </div>
+</div>
+
+<div class="section hidden" id="confirmation-section">
+  <h2>Booking Confirmation</h2>
+  <p><strong>Aadhaar:</strong> <span id="confirm-aadhaar"></span></p>
+  <p><strong>Train ID:</strong> <span id="confirm-train-id"></span></p>
+  <p><strong>Ticket ID:</strong> <span id="confirm-ticket-id"></span></p>
+  <p><strong>Boarding Station:</strong> <span id="confirm-boarding"></span></p>
+  <p><strong>Destination Station:</strong> <span id="confirm-destination"></span></p>
+  <p><strong>Number of Tickets:</strong> <span id="confirm-num-tickets"></span></p>
+</div>
+
+<div class="section" id="view-tickets-section">
+  <h2>View Booked Tickets</h2>
+  <div id="tickets-list"></div>
+</div>
+
+<div class="section" id="update-details-section">
+  <h2>Update Details</h2>
+  <form id="updateForm">
+    <label for="update-email">Email:</label>
+    <input type="email" id="update-email" required><br><br>
+
+    <label for="update-mobile">Mobile:</label>
+    <input type="text" id="update-mobile" minlength="10" maxlength="10" required><br><br>
+
+    <label for="update-password">Update Password:</label>
+    <input type="checkbox" id="update-password-toggle" onchange="togglePasswordFields()"><br><br>
+
+    <div id="password-fields" class="hidden">
+      <label for="current-password">Current Password:</label>
+      <input type="password" id="current-password"><br><br>
+
+      <label for="new-password">New Password:</label>
+      <input type="password" id="new-password"><br><br>
+
+      <label for="confirm-new-password">Confirm New Password:</label>
+      <input type="password" id="confirm-new-password"><br><br>
+    </div>
+
+    <button type="button" onclick="updateDetails()">Update</button>
+  </form>
+  <button onclick="logout()">Log Out</button>
+</div>
+
+<script src="../Javascript/customer.js">
+//   const loggedUser = JSON.parse(localStorage.getItem('loggedUser'));
+//   const users = JSON.parse(localStorage.getItem('users')) || [];
+//   const tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+
+//   // Populate aggregate tables
+//   function populateAggregates() {
+//     const categoryCounts = { 'AC-1': 0, 'AC-2': 0, 'AC-3': 0 };
+//     const quarterCounts = { 'Q1': 0, 'Q2': 0, 'Q3': 0, 'Q4': 0 };
+
+//     tickets.forEach(ticket => {
+//       categoryCounts[ticket.category] = (categoryCounts[ticket.category] || 0) + ticket.numberOfTickets;
+//       const month = new Date(ticket.date).getMonth() + 1;
+//       if (month <= 3) quarterCounts['Q1']++;
+//       else if (month <= 6) quarterCounts['Q2']++;
+//       else if (month <= 9) quarterCounts['Q3']++;
+//       else quarterCounts['Q4']++;
+//     });
+
+//     // Populate category table
+//     const categoryTableBody = document.querySelector('#category-table tbody');
+//     categoryTableBody.innerHTML = '';
+//     for (const [category, count] of Object.entries(categoryCounts)) {
+//       const row = `<tr><td>${category}</td><td>${count}</td></tr>`;
+//       categoryTableBody.innerHTML += row;
+//     }
+
+//     // Populate quarter table
+//     const quarterTableBody = document.querySelector('#quarter-table tbody');
+//     quarterTableBody.innerHTML = '';
+//     for (const [quarter, count] of Object.entries(quarterCounts)) {
+//       const row = `<tr><td>${quarter}</td><td>${count}</td></tr>`;
+//       quarterTableBody.innerHTML += row;
+//     }
+//   }
+
+//   // Populate logged user data into update form
+//   document.getElementById('update-email').value = loggedUser?.email || '';
+//   document.getElementById('update-mobile').value = loggedUser?.mobile || '';
+
+//   // Load booked tickets for the logged user
+//   function loadTickets() {
+//     const userTickets = tickets.filter(ticket => ticket.aadhaar === loggedUser.aadhaar);
+//     const ticketsList = document.getElementById('tickets-list');
+//     ticketsList.innerHTML = '';
+
+//     if (userTickets.length > 0) {
+//       userTickets.forEach(ticket => {
+//         const div = document.createElement('div');
+//         div.innerHTML = `
+//           <p><strong>Ticket ID:</strong> ${ticket.ticket_id}</p>
+//           <p><strong>Train ID:</strong> ${ticket.train_id}</p>
+//           <p><strong>Aadhaar:</strong> ${ticket.aadhaar}</p>
+//           <p><strong>Username:</strong> ${ticket.username}</p>
+//           <p><strong>Boarding Station:</strong> ${ticket.boarding}</p>
+//           <p><strong>Destination Station:</strong> ${ticket.destination}</p>
+//           <p><strong>Number of Tickets:</strong> ${ticket.numberOfTickets}</p>
+//           <button onclick="cancelTicket('${ticket.ticket_id}')">Cancel Ticket</button>
+//           <hr>
+//         `;
+//         ticketsList.appendChild(div);
+//       });
+//     } else {
+//       ticketsList.innerHTML = '<p>No tickets booked.</p>';
+//     }
+//   }
+
+//   // Cancel ticket
+//   function cancelTicket(ticketId) {
+//     const updatedTickets = tickets.filter(ticket => ticket.ticket_id !== ticketId);
+//     localStorage.setItem('tickets', JSON.stringify(updatedTickets));
+//     loadTickets();
+//     populateAggregates();
+//   }
+
+//   // Toggle password fields visibility
+//   function togglePasswordFields() {
+//     const passwordFields = document.getElementById('password-fields');
+//     passwordFields.classList.toggle('hidden');
+//   }
+
+//   // Update user details
+//   function updateDetails() {
+//     const email = document.getElementById('update-email').value;
+//     const mobile = document.getElementById('update-mobile').value;
+//     const updatePassword = document.getElementById('update-password-toggle').checked;
+
+//     if (updatePassword) {
+//       const currentPassword = document.getElementById('current-password').value;
+//       const newPassword = document.getElementById('new-password').value;
+//       const confirmNewPassword = document.getElementById('confirm-new-password').value;
+
+//       if (newPassword !== confirmNewPassword) {
+//         alert('New password and confirm password do not match.');
+//         return;
+//       }
+
+//       if (!/^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$/.test(newPassword)) {
+//         alert('New password must meet the required criteria.');
+//         return;
+//       }
+
+//       if (loggedUser.password !== currentPassword) {
+//         alert('Current password is incorrect.');
+//         return;
+//       }
+
+//       loggedUser.password = newPassword;
+//     }
+
+//     loggedUser.email = email;
+//     loggedUser.mobile = mobile;
+
+//     const userIndex = users.findIndex(user => user.username === loggedUser.username);
+//     if (userIndex !== -1) {
+//       users[userIndex] = loggedUser;
+//       localStorage.setItem('users', JSON.stringify(users));
+//       localStorage.setItem('loggedUser', JSON.stringify(loggedUser));
+//       alert('Details updated successfully!');
+//     } else {
+//       alert('Error updating user details.');
+//     }
+//   }
+
+//   // Log out
+//   function logout() {
+//     localStorage.removeItem('loggedUser');
+//     window.location.href = 'login.html';
+//   }
+
+//   // Load tickets on page load
+//   loadTickets();
+//   populateAggregates();
+</script>
+
 </body>
 </html>
